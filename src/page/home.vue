@@ -4,14 +4,14 @@
       <div class="search-item-container">
         <label>学校</label>
         <div class="right-container" @click="toggleActionSheet('school')">
-          <div class="search-name">{{selectSchName}}</div>
+          <div class="search-name">{{selectSchName || '默认'}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
       <div class="search-item-container">
         <label>学院</label>
         <div class="right-container" @click="toggleActionSheet('academy')">
-          <div class="search-name">{{selectAcademyName}}</div>
+          <div class="search-name">{{selectAcademyName || '所有'}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
@@ -263,6 +263,7 @@
             border-top: 2px solid #CCCCCCFF;
             border-right: 2px solid #CCCCCCFF;
             transform: rotate(45deg);
+            -webkit-transform: rotate(45deg);
           }
         }
       }

@@ -3,29 +3,28 @@
     <div class="search-container">
       <div class="search-item-container">
         <label>学校</label>
-        <div class="right-container" @click="toggleActionSheet">
-          <div class="search-name">所有</div>
+        <div class="right-container" @click="toggleActionSheet('school')">
+          <div class="search-name">{{selectSchName}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
       <div class="search-item-container">
         <label>学院</label>
-        <div class="right-container">
-          <div class="search-name">所有</div>
+        <div class="right-container" @click="toggleActionSheet('academy')">
+          <div class="search-name">{{selectAcademyName}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
       <div class="search-item-container">
         <label>专业</label>
-        <div class="right-container">
-          <div class="search-name">所有</div>
+        <div class="right-container" @click="toggleActionSheet('major')">
+          <div class="search-name">{{selectMajorName}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
     </div>
     <div class="data-count-container">
       <div class="data-count-title">分会场视角</div>
-      <!--<div class="graph" id="count1"></div>-->
       <div class="graph" id="count5"></div>
       <div class="graph" id="count2"></div>
       <div class="graph" id="count3"></div>
@@ -40,24 +39,29 @@
 
 <script>
   import { Actionsheet } from 'mint-ui';
+  import school from '../data/school';
+  import academy from '../data/academy';
+  import major from '../data/major';
 
   let echarts = require('echarts');
   export default {
     name: 'Home',
     data() {
       return {
-        actions: [
-          {name: '清华大学'},
-          {name: '北京大学'},
-          {name: '中国人民大学'},
-          {name: '西安交通大学'},
-          {name: '新疆石河子大学'}
-        ],
-        sheetVisible: false
+        actions: [],
+        sheetVisible: false,
+        selectSchName: '',
+        selectAcademyName: '',
+        selectMajorName: ''
       }
     },
     components: {
 
+    },
+    created() {
+      school.forEach(item => item.method = this.schoolItemClick);
+      academy.forEach(item => item.method = this.academyItemClick);
+      major.forEach(item => item.method = this.majorItemClick);
     },
     mounted () {
 //      this.renderCount1();
@@ -67,8 +71,26 @@
       this.renderCount5();
     },
     methods: {
-      toggleActionSheet() {
+      toggleActionSheet(type) {
+        if (type == 'school') {
+          this.actions = school;
+        }
+        if (type == 'academy') {
+          this.actions = academy;
+        }
+        if (type == 'major') {
+          this.actions = major;
+        }
         this.sheetVisible = !this.sheetVisible;
+      },
+      schoolItemClick(item) {
+        this.selectSchName = item.name;
+      },
+      academyItemClick(item) {
+        this.selectAcademyName = item.name;
+      },
+      majorItemClick(item) {
+        this.selectMajorName = item.name;
       },
       renderCount2() {
         let myChart = echarts.init(document.getElementById('count2'));
@@ -93,7 +115,7 @@
           },
           yAxis: {
             type: 'category',
-            data: ['周一','周二','周三','周四','周五','周六','周日']
+            data: ['周一','周二','周三', '周四', '周五', '周六', '周日']
           },
           series: [
             {

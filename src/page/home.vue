@@ -1,43 +1,50 @@
 <template>
   <div class="home-wrapper">
+    <div class="search-text">
+      <img src="../assets/search.png" alt="search" width="17" height="17">
+      搜索
+    </div>
     <div class="search-container">
       <div class="search-item-container">
-        <label>学校</label>
-        <div class="right-container" @click="toggleActionSheet('school')">
-          <div class="search-name">{{selectSchName || '默认'}}</div>
+        <label>
+          学校
+          <img src="../assets/information.png" alt="info" width="17" height="17">
+        </label>
+        <div class="right-container" @click="togglePicker('school')">
+          <div class="search-name">{{selectSchName}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
       <div class="search-item-container">
-        <label>学院</label>
-        <div class="right-container" @click="toggleActionSheet('academy')">
+        <label>
+          学院
+          <img src="../assets/information.png" alt="info" width="17" height="17">
+        </label>
+        <div class="right-container" @click="togglePicker('academy')">
           <div class="search-name">{{selectAcademyName || '所有'}}</div>
           <div class="right-arrow"></div>
         </div>
       </div>
-      <!--<div class="search-item-container">-->
-        <!--<label>专业</label>-->
-        <!--<div class="right-container" @click="toggleActionSheet('major')">-->
-          <!--<div class="search-name">{{selectMajorName}}</div>-->
-          <!--<div class="right-arrow"></div>-->
-        <!--</div>-->
-      <!--</div>-->
     </div>
     <div class="data-count-container">
-      <div class="data-count-title">分会场视角</div>
+      <div class="data-count-title">
+        <img src="../assets/data.png" alt="data" width="17" height="17">
+        数据统计
+      </div>
+      <div class="graph" id="count5"></div>
       <div class="graph" id="count2"></div>
       <div class="graph" id="count4"></div>
-      <div class="graph" id="count5"></div>
     </div>
-    <mt-actionsheet
+    <mt-picker :slots="slots" @change="pickerItemClick" :show-toolbar="true" value-key="name" v-show="sheetVisible"></mt-picker>
+    <!--<mt-actionsheet
       :actions="actions"
       v-model="sheetVisible">
-    </mt-actionsheet>
+    </mt-actionsheet>-->
   </div>
 </template>
 
 <script>
-  import { Actionsheet } from 'mint-ui';
+  import { Actionsheet, Picker } from 'mint-ui';
   import school from '../data/school';
   import academy from '../data/academy';
   import major from '../data/major';
@@ -50,9 +57,19 @@
       return {
         actions: [],
         sheetVisible: false,
+        selectSchId: 0,
         selectSchName: '',
         selectAcademyName: '',
-        selectMajorName: ''
+        selectMajorName: '',
+        slots: [
+          {
+            flex: 1,
+            values: [],
+            className: 'slot1',
+            textAlign: 'center',
+            name: '取消'
+          }
+        ]
       }
     },
     components: {
@@ -62,6 +79,9 @@
       school.forEach(item => item.method = this.schoolItemClick);
       academy.forEach(item => item.method = this.academyItemClick);
       major.forEach(item => item.method = this.majorItemClick);
+
+      this.selectSchName = school[0].name; // 默认选中第一个学校的名称
+      this.selectSchId = school[0].id;
     },
     mounted () {
       this.renderCount2();
@@ -69,20 +89,27 @@
       this.renderCount5();
     },
     methods: {
-      toggleActionSheet(type) {
+      togglePicker(type) {
+        let result = [];
         if (type == 'school') {
-          this.actions = school;
+          school.forEach(item => result.push({name: item.name, id: item.id}));
+          this.slots[0].values = result;
         }
         if (type == 'academy') {
           this.actions = academy;
         }
-        if (type == 'major') {
-          this.actions = major;
-        }
         this.sheetVisible = !this.sheetVisible;
+      },
+      pickerItemClick(picker, values) {
+        console.warn('picker：', picker, ' values：', values);
+//        this.sheetVisible = false;
       },
       schoolItemClick(item) {
         this.selectSchName = item.name;
+        this.selectSchId = item.id;
+        this.renderCount2();
+        this.renderCount4();
+        this.renderCount5();
       },
       academyItemClick(item) {
         this.selectAcademyName = item.name;
@@ -95,15 +122,19 @@
         let academyNameArr = [],
           totalArr = [],
           aboardArr = [];
+
         academy.forEach(item => {
-          academyNameArr.push(item.name);
-          totalArr.push(item.total);
-          aboardArr.push(item.value);
+          if (item.schId == this.selectSchId) {
+            let children = item.children;
+            academyNameArr.push(children.name);
+            totalArr.push(children.total);
+            aboardArr.push(children.value);
+          }
         });
         let option = {
           title: {
-            text: 'xxx2',
-            subtext: 'sub-xxxx3'
+            text: '留学人数统计',
+            top: '2%'
           },
           tooltip: {
             trigger: 'axis',
@@ -112,7 +143,9 @@
             }
           },
           legend: {
-            data: ['总共', '参加']
+            right: '1%',
+            top: '2%',
+            data: ['学院总人数', '学院留学人数']
           },
           grid: {
             left: '3%',
@@ -130,12 +163,12 @@
           },
           series: [
             {
-              name: '总共',
+              name: '学院总人数',
               type: 'bar',
               data: totalArr
             },
             {
-              name: '参加',
+              name: '学院留学人数',
               type: 'bar',
               data: aboardArr
             }
@@ -145,6 +178,18 @@
       },
       renderCount4() {
         let myChart = echarts.init(document.getElementById('count4'));
+        let academyNameArr = [],
+          totalArr = [],
+          aboardArr = [];
+
+        academy.forEach(item => {
+          if (item.schId == this.selectSchId) {
+            let children = item.children;
+            academyNameArr.push(children.name);
+            totalArr.push(children.total);
+            aboardArr.push(children);
+          }
+        });
         let option = {
           color:  [
             '#c23531','#2f4554', '#61a0a8', '#d48265',
@@ -152,28 +197,27 @@
             '#6e7074', '#546570', '#c4ccd3'
           ],
           title : {
-            text: 'xxxx1',
+            text: '学院留学人数占比',
+            top: '2%',
             'x': 'center'
           },
           legend: {
             // orient: 'vertical',
             top: '10%',
-            left: '5%',
+            left: '0',
             type: 'scroll'
           },
           tooltip: {
             trigger: 'item',
-            formatter: '{a} <br/>{b} : {c} ({d}%)',
-            data : academy ? academy.map((item) => {
-              return item.name;
-            }) : '',
+            formatter: '{a} <br/>{b} : {c}人 ({d}%)',
+            data : academyNameArr,
           },
           series: [{
-            name: '学院占比',
+            name: '学院留学人数',
             type: 'pie',
-            radius: '60%',
-            center: ['55%', '50%'],
-            data: academy,
+            radius: '80%',
+            center: ['55%', '60%'],
+            data: aboardArr,
             itemStyle: {
               emphasis: {
                 shadowBlur: 10,
@@ -188,6 +232,10 @@
       renderCount5() {
         let myChart = echarts.init(document.getElementById('count5'));
         let option = {
+          title : {
+            text: '学校树形图',
+            top: '5%'
+          },
           tooltip: {
             trigger: 'item',
             triggerOn: 'mousemove'
@@ -195,16 +243,12 @@
           series: [
             {
               type: 'tree',
-
               data: [schoolJson],
-
               top: '1%',
-              left: '7%',
+              left: '17%',
               bottom: '1%',
               right: '20%',
-
-              symbolSize: 7,
-
+              symbolSize: 9,
               label: {
                 normal: {
                   position: 'left',
@@ -238,6 +282,17 @@
 
 <style lang="less" scoped>
   .home-wrapper {
+    .search-text {
+      color: #999999FF;
+      padding-left: 8px;
+      font-size: 14px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      img {
+        margin-right: 10px;
+      }
+    }
     .search-container {
       .search-item-container {
         display: flex;
@@ -248,7 +303,11 @@
         padding: 0 15px;
         background-color: #fff;
         label {
-
+          display: flex;
+          align-items: center;
+          img {
+            margin-left: 10px;
+          }
         }
         .right-container {
           display: flex;
@@ -269,15 +328,19 @@
       }
     }
     .data-count-container {
-      margin: 12px 18px 13px 18px;
+      margin: 12px 8px 13px 8px;
 
       .data-count-title {
         color: #999999FF;
         font-size: 14px;
+        display: flex;
+        img {
+          margin-right: 10px;
+        }
       }
       .graph {
         width: 100%;
-        min-height: 400px;
+        min-height: 600px;
         background-color: #fff;
         margin-top: 15px;
       }

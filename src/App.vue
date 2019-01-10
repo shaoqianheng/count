@@ -24,4 +24,18 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
 }
+  .picker {
+    position: fixed;
+    background-color: rgba(0, 0, 0, .2);
+    width: 100%;
+    height: 100%;
+    top: 0;
+  }
+  .picker-items {
+    background: #fff;
+    bottom: 0;
+    position: absolute;
+    color: #ccc;
+    width: 100%
+  }
 </style>

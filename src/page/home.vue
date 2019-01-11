@@ -12,7 +12,6 @@
         </label>
         <div class="right-container" @click="togglePicker('school')">
           <div class="search-name">{{selectSchName}}</div>
-          <div class="right-arrow"></div>
         </div>
       </div>
       <div class="search-item-container">
@@ -22,7 +21,6 @@
         </label>
         <div class="right-container" @click="togglePicker('academy')">
           <div class="search-name">{{selectAcademyName || '所有'}}</div>
-          <div class="right-arrow"></div>
         </div>
       </div>
     </div>
@@ -41,7 +39,42 @@
         表格统计
       </div>
       <div class="graph-container">
-
+        <table>
+          <thead>
+            <tr>
+              <th>学院名称</th>
+              <th>总人数</th>
+              <th>留学人数</th>
+              <th>留学率</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>xxx1</td>
+              <td>239</td>
+              <td>23</td>
+              <td>49%</td>
+            </tr>
+            <tr>
+              <td>xxx1</td>
+              <td>239</td>
+              <td>23</td>
+              <td>49%</td>
+            </tr>
+            <tr>
+              <td>xxx1</td>
+              <td>239</td>
+              <td>23</td>
+              <td>49%</td>
+            </tr>
+            <tr>
+              <td>xxx1</td>
+              <td>239</td>
+              <td>23</td>
+              <td>49%</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <div class="picker-container" v-if="sheetVisible" transition="modal">
@@ -334,11 +367,12 @@
     .search-container {
       .search-item-container {
         display: flex;
+        position: relative;
         justify-content: space-between;
         align-items: center;
         border-bottom: 1px solid #E2E2E2FF;
         height: 65px;
-        padding: 0 15px;
+        padding: 0 35px 0 15px;
         background-color: #fff;
         label {
           display: flex;
@@ -353,14 +387,21 @@
           color: #999999FF;
           .search-name {
             margin-left: 10px;
+            display: flex;
+            align-items: center;
           }
-          .right-arrow {
-            width: 7px;
-            height: 7px;
-            border-top: 2px solid #CCCCCCFF;
-            border-right: 2px solid #CCCCCCFF;
-            transform: rotate(45deg);
-            -webkit-transform: rotate(45deg);
+          ::after {
+            border: 2px solid #c8c8cd;
+            border-bottom-width: 0;
+            border-left-width: 0;
+            content: '';
+            top: 32px;
+            right: 20px;
+            position: absolute;
+            width: 8px;
+            height: 9px;
+            -webkit-transform: translateY(-50%) rotate(45deg);
+            transform: translateY(-50%) rotate(45deg);
           }
         }
       }
@@ -381,6 +422,26 @@
         min-height: 600px;
         background-color: #fff;
         margin-top: 15px;
+      }
+      .graph-container {
+        margin-top: 15px;
+        background: #fff;
+        width: 100%;
+        padding: 10px 8px;
+        table {
+          width: 100%;
+          th {
+            color: #B1B1B1;
+            height: 40px;
+            line-height: 40px;
+          }
+          td {
+            width: 25%;
+            height: 35px;
+            line-height: 35px;
+            text-align: center;
+          }
+        }
       }
     }
   }

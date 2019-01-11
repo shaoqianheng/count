@@ -8,7 +8,7 @@
       <div class="search-item-container">
         <label>
           学校
-          <img src="../assets/information.png" alt="info" width="17" height="17">
+          <img src="../assets/information.png" title="我ID返回是房间都放假多少房贷会返回闪电发货第三方恒大华府红烧豆腐但是返回但是返回但是返回的是非得失佛挡杀佛大后方都恢复好地方" alt="info" width="17" height="17">
         </label>
         <div class="right-container" @click="togglePicker('school')">
           <div class="search-name">{{selectSchName}}</div>
@@ -17,7 +17,7 @@
       <div class="search-item-container">
         <label>
           学院
-          <img src="../assets/information.png" alt="info" width="17" height="17">
+          <img src="../assets/information.png" title="我ID返回是房间都放假多少房贷会返回闪电发货第三方恒大华府红烧豆腐但是返回但是返回但是返回的是非得失佛挡杀佛大后方都恢复好地方" alt="info" width="17" height="17">
         </label>
         <div class="right-container" @click="togglePicker('academy')">
           <div class="search-name">{{selectAcademyName || '所有'}}</div>

@@ -1,5 +1,4 @@
 export default [
-  // 清华大学
   {
     schId: 1, // 清华大学
     name: '清华大学',

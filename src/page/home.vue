@@ -49,40 +49,31 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>xxx1</td>
-              <td>239</td>
-              <td>23</td>
-              <td>49%</td>
-            </tr>
-            <tr>
-              <td>xxx1</td>
-              <td>239</td>
-              <td>23</td>
-              <td>49%</td>
-            </tr>
-            <tr>
-              <td>xxx1</td>
-              <td>239</td>
-              <td>23</td>
-              <td>49%</td>
-            </tr>
-            <tr>
-              <td>xxx1</td>
-              <td>239</td>
-              <td>23</td>
-              <td>49%</td>
+            <tr v-for="info in tableArr">
+              <td>{{info.name}}</td>
+              <td>{{info.total}}</td>
+              <td>{{info.value}}</td>
+              <td>{{info.rate}}</td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <div class="picker-container" v-if="sheetVisible" transition="modal">
-      <mt-picker :slots="slots" @change="onPickerItemChange" :showToolbar="true" value-key="name">
+    <div class="picker-container" v-if="schoolPicker" transition="modal">
+      <mt-picker :slots="schoolSlots" @change="onSchItemChange" :showToolbar="true" value-key="name">
         <div class="tool-bar">
-          <span class="cancel-btn" @click="sheetVisible=false">取消</span>
-          <span class="title">{{pickerTitle}}</span>
-          <span class="sure-btn" @click="selectPickerItem">确定</span>
+          <span class="cancel-btn" @click="schoolPicker=false">取消</span>
+          <span class="title">请选择学校</span>
+          <span class="sure-btn" @click="schoolItemClick">确定</span>
+        </div>
+      </mt-picker>
+    </div>
+    <div class="picker-container" v-if="academyPicker" transition="modal">
+      <mt-picker :slots="academySlots" @change="onAcademyItemChange" :showToolbar="true" value-key="name">
+        <div class="tool-bar">
+          <span class="cancel-btn" @click="academyPicker=false">取消</span>
+          <span class="title">请选择学院</span>
+          <span class="sure-btn" @click="academyItemClick">确定</span>
         </div>
       </mt-picker>
     </div>
@@ -103,33 +94,36 @@
       return {
         actions: [],
         changeAcademy: academy,
-        sheetVisible: false,
+        schoolPicker: false,
+        academyPicker: false,
         isShowTreeGraph: true,
         selectSchId: 0,
         selectSchName: '',
+        selectAcademyId: '',
         selectAcademyName: '',
-        selectMajorName: '',
-        pickerTitle: '',
-        pickerType: 1,
-        changePickerItem: {},
-        slots: [
+        changeSchPickerItem: {},
+        changeAcademyPickerItem: {},
+        schoolSlots: [
           {
             flex: 1,
             values: [],
-            className: 'slot1',
             textAlign: 'center',
-            name: '取消'
           }
-        ]
+        ],
+        academySlots: [
+          {
+            flex: 1,
+            values: [],
+            textAlign: 'center',
+          }
+        ],
+        tableArr: []
       }
     },
     components: {
 
     },
     created() {
-      school.forEach(item => item.method = this.schoolItemClick);
-      academy.forEach(item => item.method = this.academyItemClick);
-
       this.selectSchName = school[0].name; // 默认选中第一个学校的名称
       this.selectSchId = school[0].id;
     },
@@ -137,59 +131,63 @@
       this.renderCount1();
       this.renderCount2();
       this.renderCount3();
+      this.renderTable();
     },
     methods: {
       togglePicker(type) {
         let result = [];
         if (type == 'school') {
+          this.schoolPicker = true;
           school.forEach(item => result.push({name: item.name, id: item.id}));
-          this.slots[0].values = result;
-          this.pickerTitle = '请选择学校';
-          this.pickerType = '1';  // 学校
+          this.schoolSlots[0].values = result;
         }
         if (type == 'academy') {
-          this.actions = this.changeAcademy;
-          this.pickerTitle = '请选择学院';
-          this.pickerType = '2';  // 学院
+          let schId = this.selectSchId;
+          this.academyPicker = true;
+          academy.forEach(item => {
+            if (item.schId == schId) {
+              result.push({name: item.children.name, id: item.children.id})
+            }
+          })
+          this.academySlots[0].values = result;
         }
-        this.sheetVisible = !this.sheetVisible;
       },
-      onPickerItemChange(picker, values) {
-        this.changePickerItem = values[0];
+      onSchItemChange(picker, values) {
+        this.changeSchPickerItem = values[0];
       },
-      selectPickerItem() {
-        let selectType = this.pickerType;
-        let selectInfo = this.changePickerItem;
-
-        selectInfo == 1 ? this.schoolItemClick(selectInfo) : this.academyItemClick(selectInfo);
+      onAcademyItemChange(picker, values) {
+        this.changeAcademyPickerItem = values[0];
       },
-      schoolItemClick(info) {
+      schoolItemClick() {
+        let selectSchInfo = this.changeSchPickerItem;
         // 设置学校信息
-        this.selectSchName = info.name;
-        this.selectSchId = info.id;
-        // 更新学院信息
-        let academyResult = [];
-        academy.forEach(item => {
-          if (item.schId ==  info.id) {
-            academyResult.push(item);
-          }
-        })
-        this.changeAcademy = academyResult;
+        this.selectSchName = selectSchInfo.name;
+        this.selectSchId = selectSchInfo.id;
+
         this.selectAcademyName = '所有';
+        this.schoolPicker = false;
+        this.isShowTreeGraph = true;
         // 渲染数据
         this.renderCount1();
         this.renderCount2();
         this.renderCount3();
       },
-      academyItemClick(info) {
-        this.selectAcademyName = info.name;
+      academyItemClick() {
+        let selectAcademyInfo = this.changeAcademyPickerItem;
+
+        this.selectAcademyName = selectAcademyInfo.name;
+        this.selectAcademyId = selectAcademyInfo.id;
+
         this.isShowTreeGraph = false;
+        this.academyPicker = false;
         // 渲染数据
         this.renderCount2();
         this.renderCount3();
       },
       renderCount1() {
         let myChart = echarts.init(document.getElementById('count1'));
+        let renderData = schoolJson.filter(item => item.schId == this.selectSchId)[0];
+
         let option = {
           title : {
             text: '学校树形图',
@@ -202,7 +200,7 @@
           series: [
             {
               type: 'tree',
-              data: [schoolJson],
+              data: [renderData],
               top: '1%',
               left: '17%',
               bottom: '1%',
@@ -347,6 +345,22 @@
         };
         myChart.setOption(option);
       },
+      renderTable() {
+        let resultArr = [];
+
+        academy.forEach(item => {
+          if (item.schId == this.selectSchId) {
+            let info = item.children;
+            resultArr.push({
+              name: info.name,
+              value: info.value,
+              total: info.total,
+              rate: info.rate
+            });
+          }
+        })
+        this.tableArr = resultArr;
+      }
     }
   }
 </script>
@@ -426,8 +440,10 @@
       .graph-container {
         margin-top: 15px;
         background: #fff;
-        width: 100%;
+        /*width: 100%;*/
         padding: 10px 8px;
+        max-height: 450px;
+        overflow-y: auto;
         table {
           width: 100%;
           th {

@@ -8,7 +8,7 @@
       <div class="search-item-container">
         <label>
           学校
-          <img src="../assets/information.png" title="我ID返回是房间都放假多少房贷会返回闪电发货第三方恒大华府红烧豆腐但是返回但是返回但是返回的是非得失佛挡杀佛大后方都恢复好地方" alt="info" width="17" height="17">
+          <img src="../assets/information.png" @click="infoAlert('school')" alt="info" width="17" height="17">
         </label>
         <div class="right-container" @click="togglePicker('school')">
           <div class="search-name">{{selectSchName}}</div>
@@ -17,7 +17,7 @@
       <div class="search-item-container">
         <label>
           学院
-          <img src="../assets/information.png" title="我ID返回是房间都放假多少房贷会返回闪电发货第三方恒大华府红烧豆腐但是返回但是返回但是返回的是非得失佛挡杀佛大后方都恢复好地方" alt="info" width="17" height="17">
+          <img src="../assets/information.png" @click="infoAlert('academy')" alt="info" width="17" height="17">
         </label>
         <div class="right-container" @click="togglePicker('academy')">
           <div class="search-name">{{selectAcademyName || '所有'}}</div>
@@ -29,7 +29,7 @@
         <img src="../assets/data.png" alt="data" width="17" height="17">
         数据统计
       </div>
-      <div class="graph" id="count1" v-if="isShowTreeGraph"></div>
+      <div class="graph" id="count1" v-show="isShowTreeGraph"></div>
       <div class="graph" id="count2"></div>
       <div class="graph" id="count3"></div>
     </div>
@@ -81,10 +81,10 @@
 </template>
 
 <script>
-  import { Actionsheet, Picker } from 'mint-ui';
+  import { Actionsheet, Picker, MessageBox } from 'mint-ui';
   import school from '../data/school';
-  import academy from '../data/academy';
-  import major from '../data/major';
+  import academy from '../data/academy/index';
+  import major from '../data/major/index';
   import schoolJson from '../data/school-json';
 
   let echarts = require('echarts');
@@ -99,7 +99,7 @@
         isShowTreeGraph: true,
         selectSchId: 0,
         selectSchName: '',
-        selectAcademyId: '',
+        selectAcademyId: 0,
         selectAcademyName: '',
         changeSchPickerItem: {},
         changeAcademyPickerItem: {},
@@ -124,16 +124,37 @@
 
     },
     created() {
-      this.selectSchName = school[0].name; // 默认选中第一个学校的名称
-      this.selectSchId = school[0].id;
+      this.selectSchName = this.changeSchPickerItem.name = school[0].name; // 默认选中第一个学校的名称
+      this.selectSchId = this.changeSchPickerItem.id = school[0].id;
+
     },
     mounted () {
-      this.renderCount1();
-      this.renderCount2();
-      this.renderCount3();
-      this.renderTable();
+      this.schoolItemClick();
     },
     methods: {
+      infoAlert(type) {
+        let typeName = '',
+          info = '';
+        if (type == 'school') {
+          typeName = '学校信息提示';
+          school.forEach(item => {
+            if (item.id == this.selectSchId) {
+              info = item.info;
+            }
+          })
+
+        } else if (type == 'academy' && this.selectAcademyId) {
+          typeName = '学院信息提示';
+          academy.forEach(item => {
+            if (item.schId == this.selectSchId && item.id == this.selectAcademyId) {
+              info = item.info;
+            }
+          })
+        } else if (type == 'academy' && !this.selectAcademyId) {
+          return false;
+        }
+        MessageBox.alert(info, typeName);
+      },
       togglePicker(type) {
         let result = [];
         if (type == 'school') {
@@ -146,7 +167,7 @@
           this.academyPicker = true;
           academy.forEach(item => {
             if (item.schId == schId) {
-              result.push({name: item.children.name, id: item.children.id})
+              result.push({name: item.name, id: item.id})
             }
           })
           this.academySlots[0].values = result;
@@ -165,12 +186,28 @@
         this.selectSchId = selectSchInfo.id;
 
         this.selectAcademyName = '所有';
+        this.selectAcademyId = 0;
         this.schoolPicker = false;
         this.isShowTreeGraph = true;
-        // 渲染数据
+        // 渲染图形1
         this.renderCount1();
-        this.renderCount2();
-        this.renderCount3();
+        // 渲染图形2
+        let academyNameArr = [],
+          totalArr = [],
+          itemInfoArr = [],
+          aboardArr = [];
+
+        academy.forEach(item => {
+          if (item.schId == this.selectSchId) {
+            academyNameArr.push(item.name);
+            totalArr.push(item.total);
+            aboardArr.push(item.value);
+            itemInfoArr.push(item);
+          }
+        });
+        this.renderCount2(academyNameArr, totalArr, aboardArr);
+        this.renderCount3(academyNameArr, itemInfoArr);
+        this.renderTable(itemInfoArr);
       },
       academyItemClick() {
         let selectAcademyInfo = this.changeAcademyPickerItem;
@@ -181,8 +218,22 @@
         this.isShowTreeGraph = false;
         this.academyPicker = false;
         // 渲染数据
-        this.renderCount2();
-        this.renderCount3();
+        let majorNameArr = [],
+          totalArr = [],
+          itemInfoArr = [],
+          aboardArr = [];
+
+        major.forEach(item => {
+          if (item.schId == this.selectSchId && item.academyId == this.selectAcademyId) {
+            majorNameArr.push(item.name);
+            totalArr.push(item.total);
+            aboardArr.push(item.value);
+            itemInfoArr.push(item);
+          }
+        });
+        this.renderCount2(majorNameArr, totalArr, aboardArr);
+        this.renderCount3(majorNameArr, itemInfoArr);
+        this.renderTable(itemInfoArr);
       },
       renderCount1() {
         let myChart = echarts.init(document.getElementById('count1'));
@@ -233,20 +284,9 @@
         };
         myChart.setOption(option);
       },
-      renderCount2() {
+      renderCount2(nameArr, totalArr, aboardArr) {
         let myChart = echarts.init(document.getElementById('count2'));
-        let academyNameArr = [],
-          totalArr = [],
-          aboardArr = [];
 
-        academy.forEach(item => {
-          if (item.schId == this.selectSchId) {
-            let children = item.children;
-            academyNameArr.push(children.name);
-            totalArr.push(children.total);
-            aboardArr.push(children.value);
-          }
-        });
         let option = {
           title: {
             text: '留学人数统计',
@@ -275,7 +315,7 @@
           },
           yAxis: {
             type: 'category',
-            data: academyNameArr
+            data: nameArr
           },
           series: [
             {
@@ -292,20 +332,9 @@
         };
         myChart.setOption(option);
       },
-      renderCount3() {
+      renderCount3(nameArr, aboardArr) {
         let myChart = echarts.init(document.getElementById('count3'));
-        let academyNameArr = [],
-          totalArr = [],
-          aboardArr = [];
 
-        academy.forEach(item => {
-          if (item.schId == this.selectSchId) {
-            let children = item.children;
-            academyNameArr.push(children.name);
-            totalArr.push(children.total);
-            aboardArr.push(children);
-          }
-        });
         let option = {
           color:  [
             '#c23531','#2f4554', '#61a0a8', '#d48265',
@@ -326,7 +355,7 @@
           tooltip: {
             trigger: 'item',
             formatter: '{a} <br/>{b} : {c}人 ({d}%)',
-            data : academyNameArr,
+            data : nameArr,
           },
           series: [{
             name: '学院留学人数',
@@ -345,20 +374,7 @@
         };
         myChart.setOption(option);
       },
-      renderTable() {
-        let resultArr = [];
-
-        academy.forEach(item => {
-          if (item.schId == this.selectSchId) {
-            let info = item.children;
-            resultArr.push({
-              name: info.name,
-              value: info.value,
-              total: info.total,
-              rate: info.rate
-            });
-          }
-        })
+      renderTable(resultArr) {
         this.tableArr = resultArr;
       }
     }

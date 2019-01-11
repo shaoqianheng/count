@@ -31,15 +31,28 @@
         <img src="../assets/data.png" alt="data" width="17" height="17">
         数据统计
       </div>
-      <div class="graph" id="count5"></div>
+      <div class="graph" id="count1" v-if="isShowTreeGraph"></div>
       <div class="graph" id="count2"></div>
-      <div class="graph" id="count4"></div>
+      <div class="graph" id="count3"></div>
     </div>
-    <mt-picker :slots="slots" @change="pickerItemClick" :show-toolbar="true" value-key="name" v-show="sheetVisible"></mt-picker>
-    <!--<mt-actionsheet
-      :actions="actions"
-      v-model="sheetVisible">
-    </mt-actionsheet>-->
+    <div class="data-count-container">
+      <div class="data-count-title">
+        <img src="../assets/table.png" alt="data" width="17" height="17">
+        表格统计
+      </div>
+      <div class="graph-container">
+
+      </div>
+    </div>
+    <div class="picker-container" v-if="sheetVisible" transition="modal">
+      <mt-picker :slots="slots" @change="onPickerItemChange" :showToolbar="true" value-key="name">
+        <div class="tool-bar">
+          <span class="cancel-btn" @click="sheetVisible=false">取消</span>
+          <span class="title">{{pickerTitle}}</span>
+          <span class="sure-btn" @click="selectPickerItem">确定</span>
+        </div>
+      </mt-picker>
+    </div>
   </div>
 </template>
 
@@ -56,11 +69,16 @@
     data() {
       return {
         actions: [],
+        changeAcademy: academy,
         sheetVisible: false,
+        isShowTreeGraph: true,
         selectSchId: 0,
         selectSchName: '',
         selectAcademyName: '',
         selectMajorName: '',
+        pickerTitle: '',
+        pickerType: 1,
+        changePickerItem: {},
         slots: [
           {
             flex: 1,
@@ -78,15 +96,14 @@
     created() {
       school.forEach(item => item.method = this.schoolItemClick);
       academy.forEach(item => item.method = this.academyItemClick);
-      major.forEach(item => item.method = this.majorItemClick);
 
       this.selectSchName = school[0].name; // 默认选中第一个学校的名称
       this.selectSchId = school[0].id;
     },
     mounted () {
+      this.renderCount1();
       this.renderCount2();
-      this.renderCount4();
-      this.renderCount5();
+      this.renderCount3();
     },
     methods: {
       togglePicker(type) {
@@ -94,28 +111,96 @@
         if (type == 'school') {
           school.forEach(item => result.push({name: item.name, id: item.id}));
           this.slots[0].values = result;
+          this.pickerTitle = '请选择学校';
+          this.pickerType = '1';  // 学校
         }
         if (type == 'academy') {
-          this.actions = academy;
+          this.actions = this.changeAcademy;
+          this.pickerTitle = '请选择学院';
+          this.pickerType = '2';  // 学院
         }
         this.sheetVisible = !this.sheetVisible;
       },
-      pickerItemClick(picker, values) {
-        console.warn('picker：', picker, ' values：', values);
-//        this.sheetVisible = false;
+      onPickerItemChange(picker, values) {
+        this.changePickerItem = values[0];
       },
-      schoolItemClick(item) {
-        this.selectSchName = item.name;
-        this.selectSchId = item.id;
+      selectPickerItem() {
+        let selectType = this.pickerType;
+        let selectInfo = this.changePickerItem;
+
+        selectInfo == 1 ? this.schoolItemClick(selectInfo) : this.academyItemClick(selectInfo);
+      },
+      schoolItemClick(info) {
+        // 设置学校信息
+        this.selectSchName = info.name;
+        this.selectSchId = info.id;
+        // 更新学院信息
+        let academyResult = [];
+        academy.forEach(item => {
+          if (item.schId ==  info.id) {
+            academyResult.push(item);
+          }
+        })
+        this.changeAcademy = academyResult;
+        this.selectAcademyName = '所有';
+        // 渲染数据
+        this.renderCount1();
         this.renderCount2();
-        this.renderCount4();
-        this.renderCount5();
+        this.renderCount3();
       },
-      academyItemClick(item) {
-        this.selectAcademyName = item.name;
+      academyItemClick(info) {
+        this.selectAcademyName = info.name;
+        this.isShowTreeGraph = false;
+        // 渲染数据
+        this.renderCount2();
+        this.renderCount3();
       },
-      majorItemClick(item) {
-        this.selectMajorName = item.name;
+      renderCount1() {
+        let myChart = echarts.init(document.getElementById('count1'));
+        let option = {
+          title : {
+            text: '学校树形图',
+            top: '5%'
+          },
+          tooltip: {
+            trigger: 'item',
+            triggerOn: 'mousemove'
+          },
+          series: [
+            {
+              type: 'tree',
+              data: [schoolJson],
+              top: '1%',
+              left: '17%',
+              bottom: '1%',
+              right: '20%',
+              symbolSize: 9,
+              label: {
+                normal: {
+                  position: 'left',
+                  verticalAlign: 'middle',
+                  align: 'right',
+                  fontSize: 9
+                }
+              },
+
+              leaves: {
+                label: {
+                  normal: {
+                    position: 'right',
+                    verticalAlign: 'middle',
+                    align: 'left'
+                  }
+                }
+              },
+
+              expandAndCollapse: true,
+              animationDuration: 550,
+              animationDurationUpdate: 750
+            }
+          ]
+        };
+        myChart.setOption(option);
       },
       renderCount2() {
         let myChart = echarts.init(document.getElementById('count2'));
@@ -176,8 +261,8 @@
         };
         myChart.setOption(option);
       },
-      renderCount4() {
-        let myChart = echarts.init(document.getElementById('count4'));
+      renderCount3() {
+        let myChart = echarts.init(document.getElementById('count3'));
         let academyNameArr = [],
           totalArr = [],
           aboardArr = [];
@@ -229,53 +314,6 @@
         };
         myChart.setOption(option);
       },
-      renderCount5() {
-        let myChart = echarts.init(document.getElementById('count5'));
-        let option = {
-          title : {
-            text: '学校树形图',
-            top: '5%'
-          },
-          tooltip: {
-            trigger: 'item',
-            triggerOn: 'mousemove'
-          },
-          series: [
-            {
-              type: 'tree',
-              data: [schoolJson],
-              top: '1%',
-              left: '17%',
-              bottom: '1%',
-              right: '20%',
-              symbolSize: 9,
-              label: {
-                normal: {
-                  position: 'left',
-                  verticalAlign: 'middle',
-                  align: 'right',
-                  fontSize: 9
-                }
-              },
-
-              leaves: {
-                label: {
-                  normal: {
-                    position: 'right',
-                    verticalAlign: 'middle',
-                    align: 'left'
-                  }
-                }
-              },
-
-              expandAndCollapse: true,
-              animationDuration: 550,
-              animationDurationUpdate: 750
-            }
-          ]
-        };
-        myChart.setOption(option);
-      }
     }
   }
 </script>
@@ -345,5 +383,53 @@
         margin-top: 15px;
       }
     }
+  }
+  .picker-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .4);
+  }
+  .picker {
+    position: fixed;
+    bottom: 0;
+    background: #fff;
+    width: 100%;
+  }
+  .vote-mt-picker {
+    background: #fff;
+    margin-top: 10%;
+    color: #999;
+  }
+  .tool-bar {
+    display: flex;
+    height: 49px;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .tool-bar .cancel-btn {
+    color: #999;
+    font-size: 16px;
+  }
+  .tool-bar .title {
+    color: #333;
+    font-size: 16px;
+  }
+  .tool-bar .sure-btn {
+    color: #6984F7;
+    font-size: 16px;
+  }
+  .modal-transition {
+    transition: all 1s ease;
+    overflow: hidden;
+  }
+  .modal-enter {
+    animation: bounce-in 1s;
+  }
+  .modal-leave {
+    animation: bounce-out 1s;
   }
 </style>

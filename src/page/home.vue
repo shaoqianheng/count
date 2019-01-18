@@ -257,10 +257,11 @@
               type: 'tree',
               data: [renderData],
               top: '1%',
-              left: '17%',
+              left: '10%',
               bottom: '1%',
-              right: '20%',
+              right: '10%',
               symbolSize: 9,
+              layout: 'radial',
               label: {
                 normal: {
                   position: 'left',
@@ -269,7 +270,6 @@
                   fontSize: 9
                 }
               },
-
               leaves: {
                 label: {
                   normal: {

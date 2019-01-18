@@ -53,7 +53,7 @@
               <td>{{info.name}}</td>
               <td>{{info.total}}</td>
               <td>{{info.value}}</td>
-              <td>{{info.rate}}</td>
+              <td>{{getRate(info)}}</td>
             </tr>
           </tbody>
         </table>
@@ -132,6 +132,10 @@
       this.schoolItemClick();
     },
     methods: {
+      getRate(info) {
+        let rate = info.value / info.total;
+        return rate.toFixed(2);
+      },
       infoAlert(type) {
         let typeName = '',
           info = '';

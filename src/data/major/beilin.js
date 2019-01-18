@@ -1,0 +1,16 @@
+export default [
+  {"schId":"5","academyId":"1","name":"林学","total":"211","value":"16","rate":"0.08","info":""},
+  {"schId":"5","academyId":"2","name":"水保","total":"230","value":"17","rate":"0.07","info":""},
+  {"schId":"5","academyId":"3","name":"生物","total":"168","value":"24","rate":"0.14","info":""},
+  {"schId":"5","academyId":"4","name":"园林","total":"446","value":"87","rate":"0.20","info":""},
+  {"schId":"5","academyId":"5","name":"经管","total":"633","value":"111","rate":"0.18","info":""},
+  {"schId":"5","academyId":"6","name":"工学","total":"320","value":"36","rate":"0.11","info":""},
+  {"schId":"5","academyId":"7","name":"材料","total":"251","value":"38","rate":"0.15","info":""},
+  {"schId":"5","academyId":"8","name":"人文","total":"160","value":"19","rate":"0.12","info":""},
+  {"schId":"5","academyId":"9","name":"外语","total":"121","value":"33","rate":"0.27","info":""},
+  {"schId":"5","academyId":"10","name":"信息","total":"221","value":"26","rate":"0.12","info":""},
+  {"schId":"5","academyId":"11","name":"理学","total":"105","value":"11","rate":"0.10","info":""},
+  {"schId":"5","academyId":"12","name":"保护区","total":"49","value":"4","rate":"0.08","info":""},
+  {"schId":"5","academyId":"13","name":"环境","total":"86","value":"8","rate":"0.09","info":""},
+  {"schId":"5","academyId":"14","name":"艺设","total":"177","value":"14","rate":"0.08","info":""},
+]

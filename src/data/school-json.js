@@ -36,15 +36,18 @@ let result = [];
 arr.forEach(item => {
   let schName = '';
   let schId = item[0].schId;
+  let schTotal = '';
 
   school.forEach(item => {
     if (item.id == schId) {
       schName = item.name;
+      schTotal = item.total;
     }
   })
   result.push({
     schId: schId,
     name: schName,
+    value: schTotal,
     children: item
   })
 })

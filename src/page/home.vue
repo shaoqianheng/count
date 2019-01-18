@@ -322,7 +322,7 @@
           legend: {
             right: '1%',
             top: '2%',
-            data: ['学院总人数', '学院留学人数']
+            data: ['总人数', '留学人数']
           },
           grid: {
             left: '3%',
@@ -340,12 +340,12 @@
           },
           series: [
             {
-              name: '学院总人数',
+              name: '总人数',
               type: 'bar',
               data: totalArr
             },
             {
-              name: '学院留学人数',
+              name: '留学人数',
               type: 'bar',
               data: aboardArr
             }
@@ -363,7 +363,7 @@
             '#6e7074', '#546570', '#c4ccd3'
           ],
           title : {
-            text: '学院留学人数占比',
+            text: '留学人数占比',
             top: '2%',
             'x': 'center'
           },
@@ -379,7 +379,7 @@
             data : nameArr,
           },
           series: [{
-            name: '学院留学人数',
+            name: '留学人数',
             type: 'pie',
             radius: '80%',
             center: ['55%', '60%'],

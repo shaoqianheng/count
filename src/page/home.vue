@@ -250,36 +250,53 @@
           },
           tooltip: {
             trigger: 'item',
-            triggerOn: 'mousemove'
+            triggerOn: 'mousemove',
+            formatter: '{b}<br/>人数 {c}',
           },
           series: [
             {
               type: 'tree',
               data: [renderData],
               top: '1%',
-              left: '10%',
+              // left: '10%',
               bottom: '1%',
-              right: '10%',
+              // right: '10%',
               symbolSize: 9,
               layout: 'radial',
+              roma: true,
               label: {
+                formatter: '{a}',
+                width: '60',
+                rich: {
+                  a: {
+                    color: 'red',
+                    lineHeight: 10
+                  },
+                },
                 normal: {
                   position: 'left',
-                  verticalAlign: 'middle',
-                  align: 'right',
-                  fontSize: 9
+                  verticalAlign: 'bottom',
+                  align: 'center',
+                  rotate: '60',
+                  fontSize: 9,
                 }
               },
               leaves: {
                 label: {
-                  normal: {
+                  /*normal: {
                     position: 'right',
                     verticalAlign: 'middle',
-                    align: 'left'
-                  }
+                    align: 'left',
+                    distance: 8,
+                    fontSize: 14,
+                  }*/
+                },
+              },
+              emphasis: {
+                label: {
+                  fontSize: '20'
                 }
               },
-
               expandAndCollapse: true,
               animationDuration: 550,
               animationDurationUpdate: 750

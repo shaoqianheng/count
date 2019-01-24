@@ -140,18 +140,18 @@
         let typeName = '',
           info = '';
         if (type == 'school') {
-          typeName = '学校信息提示';
           school.forEach(item => {
             if (item.id == this.selectSchId) {
               info = item.info;
+              typeName = item.name;
             }
           })
 
         } else if (type == 'academy' && this.selectAcademyId) {
-          typeName = '学院信息提示';
           academy.forEach(item => {
             if (item.schId == this.selectSchId && item.id == this.selectAcademyId) {
               info = item.info;
+              typeName = item.name;
             }
           })
         } else if (type == 'academy' && !this.selectAcademyId) {

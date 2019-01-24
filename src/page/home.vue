@@ -262,7 +262,7 @@
               bottom: '1%',
               // right: '10%',
               symbolSize: 9,
-              layout: 'radial',
+              // layout: 'radial',
               roma: true,
               label: {
                 formatter: '{a}',
@@ -294,7 +294,7 @@
               },
               emphasis: {
                 label: {
-                  fontSize: '20'
+                  fontSize: '16'
                 }
               },
               expandAndCollapse: true,

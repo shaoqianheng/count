@@ -29,7 +29,7 @@
         <img src="../assets/data.png" alt="data" width="17" height="17">
         数据统计
       </div>
-      <div class="graph" id="count1" v-show="isShowTreeGraph"></div>
+      <!--<div class="graph" id="count1" v-show="isShowTreeGraph"></div>-->
       <div class="graph" id="count2"></div>
       <div class="graph" id="count3"></div>
     </div>
@@ -194,7 +194,7 @@
         this.schoolPicker = false;
         this.isShowTreeGraph = true;
         // 渲染图形1
-        this.renderCount1();
+        // this.renderCount1();
         // 渲染图形2
         let academyNameArr = [],
           totalArr = [],
